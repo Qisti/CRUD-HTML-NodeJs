@@ -1,0 +1,8 @@
+/node_modules
+
+.DS_Store
+__MACOSX
+*.log
+*.local.json
+*.local.js
+*.local.yml

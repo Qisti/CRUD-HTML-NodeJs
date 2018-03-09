@@ -1,0 +1,38 @@
+<html>
+<head>
+	<title>Page Title</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="main.js"></script>
+</head>
+<body>
+	<div class="container">
+		<form>
+			<div class="form-group">
+				<label>Student Id</label>
+				<input class="form-control" name="id_student" required>
+			</div>
+			<div class="form-group">
+				<label>Name</label>
+				<input type="text" class="form-control" name="name">
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <div class="form-check-inline">
+                    <input class="form-check-input" type="radio" name="m" id="male" value="option1">Male
+                    <input class="form-check-input" type="radio" name="f" id="female" value="option2">Female
+                </div>
+            </div>    
+            <div class="form-group">
+				<label>Date of Birth</label>
+				<input type="date" class="form-control" name="date_of_birrth">
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <textarea class="form-control" name="address"></textarea>
+            </div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+</body>
+</html>

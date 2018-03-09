@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  h1= title
+  form(action="/input", method='POST')
+    a.btn.btn-primary(href="/input") Add Student
+  table(border='1 px').table
+    thead.thead-dark(align='center')
+      tr
+        td(scope='col')= 'Students Id'
+        td(scope='col')= 'Name'
+        td(scope='col')= 'Gender'
+        td(scope='col')= 'Date of Birth'
+        td(scope='col')= 'Address'
+        td
+    tbody
+      for student in data
+        tr
+          td= student.id_student
+          td
+            a(href='/students/'+student.id_student) #{student.name}
+          td= student.gender
+          td= student.date_of_birth
+          td= student.address
+          td
+            form(action="/delete-student/"+student.id_student, method='POST')
+              input.btn.btn-warning(type="submit" value="Delete")

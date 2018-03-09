@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  .container
+      form(action='/update', method='POST')
+        .form-group
+          label Student Id
+          input#id_student.form-control(name='id_student', required='', value=Id_student)
+        .form-group
+          label Name
+          input#name.form-control(type='text', name='name', value=Name)
+        .form-group
+          label Gender
+          .form-check-inline
+              .form-radio
+                .radio
+                  input#gender.form-check-input(type='radio', name='gender', value='m', checked=Gender=='m')
+                  | Male
+                .radio
+                  input#gender.form-check-input(type='radio', name='gender', value='f', checked=Gender=='f')
+                  | Female
+        .form-group
+          label Date of Birth
+          input#date_of_birth.form-control(type='date', name='date_of_birth', value=Date_of_birth)
+        .form-group
+          label Address
+          textarea#address.form-control(name='address')=Address
+        //-   input#oldId(type="hidden", name="oldId", value=sOldId)
+        button.btn.btn-primary(type='submit', value='submit') Submit
+        
