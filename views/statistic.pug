@@ -14,27 +14,30 @@ block content
         
       function drawChart() {   
         // Create our data table out of JSON data loaded from server.
-        //- var data1 = new google.visualization.arrayToDataTable(!{obj1});
+        //var data2 = new google.visualization.arrayToDataTable(!{obj2});
 
-        //- var options1 = {'title':'FREKUENSI SISWA MASUK',
-        //-                'width':1000,
-        //-                'height':600};
+        var options1 = {'title':'GENDER COMPARISON',
+                       'width':1000,
+                       'height':600};
 
+        // Instantiate and draw our chart, passing in some options.
+        var chart1 = new google.visualization.LineChart(document.getElementById('chart_div2'));
+        chart1.draw(data2, options2);
 
-        //- // Instantiate and draw our chart, passing in some options.
-        //- var chart1 = new google.visualization.AreaChart(document.getElementById('chart_div1'));
-        //- chart1.draw(data1, options1);
+        // Instantiate and draw our chart, passing in some options.
 
                 // Create our data table out of JSON data loaded from server.
         var data2 = new google.visualization.arrayToDataTable(!{obj2});
 
-        var options2 = {'title':'PERBANDINGAN GENDER',
+        var options2 = {'title':'GENDER COMPARISON',
                        'width':1000,
                        'height':600};
 
         // Instantiate and draw our chart, passing in some options.
         var chart2 = new google.visualization.PieChart(document.getElementById('chart_div2'));
         chart2.draw(data2, options2);
+        var chart3 = new google.visualization.LineChart(document.getElementById('chart_div2'));
+        chart3.draw(data1, options1);
       }
 
 
