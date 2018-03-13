@@ -1,30 +1,36 @@
 extends layout
 
 block content
-  .container
-      form(action='/update', method='POST')
-        .form-group
-          label Student Id
-          input#id_student.form-control(name='id_student', required='', value=Id_student)
-        .form-group
-          label Name
-          input#name.form-control(type='text', name='name', value=Name)
-        .form-group
-          label Gender
-          .form-check-inline
-              .form-radio
-                .radio
-                  input#gender.form-check-input(type='radio', name='gender', value='m', checked=Gender=='m')
-                  | Male
-                .radio
-                  input#gender.form-check-input(type='radio', name='gender', value='f', checked=Gender=='f')
-                  | Female
-        .form-group
-          label Date of Birth
-          input#date_of_birth.form-control(type='date', name='date_of_birth', value=Date_of_birth)
-        .form-group
-          label Address
-          textarea#address.form-control(name='address')=Address
-        //-   input#oldId(type="hidden", name="oldId", value=sOldId)
-        button.btn.btn-primary(type='submit', value='submit') Submit
+    h1.font-bold.text-center.text-xl.m-4 Edit Student
+    form.m-4(action='/update', method='POST')
+      .form-group
+        label Student Id
+        input#id_student.form-control(name='id_student', required='', value=Id_student)
+      .form-group
+        label Name
+        input#name.form-control(type='text', name='name', value=Name)
+      .form-group
+        label Gender 
+        .form-check-inline
+          .form-radio
+              .radio
+                input#gender.form-check-input(type='radio', name='gender', value='m', checked=Gender=='m')
+                | Male
+              .radio
+                input#gender.form-check-input(type='radio', name='gender', value='f', checked=Gender=='f')
+                | Female
+      .form-group
+        label Date of Birth
+        input#date_of_birth.form-control(type='date', name='date_of_birth', value=Date_of_birth)
+      .form-group
+        label Address
+        textarea#address.form-control(name='address')=Address
+      .form-group
+          label Mail
+          input#mail.form-control(type='text', name='mail', value=Mail)
+      .form-group
+        label Date of Entry
+        input#date_of_entry.form-control(type='date', name='date_of_entry', value=Date_of_entry)
+      //-   input#oldId(type="hidden", name="oldId", value=sOldId)
+      button.bg-teal.text-white.py-2.px-4.mt-4.rounded(type='submit', value='submit') Submit
         

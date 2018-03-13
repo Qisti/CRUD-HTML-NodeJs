@@ -30,7 +30,9 @@ router.post('/', function(req, res) {
     name: req.body.name,
     gender: req.body.gender,
     date_of_birth: req.body.date_of_birth,
-    address: req.body.address
+		address: req.body.address,
+		mail: req.body.mail,
+		date_of_entry: req.body.date_of_entry 
   }
   
   connection.query("INSERT INTO students SET ? ", insert, function(err, res) {
@@ -50,6 +52,7 @@ router.get('/students/id', function(req, res){
 				res.redirect('/')
 		} else { 
 			var date_of_birth = formatDateForPug(rows[0].date_of_birth);
+			var date_of_entry = formatDateForPug(rows[0].date_of_entry);
 			// if user found
 			// render to views/index.pug template file
 			res.render('edit', {
@@ -59,6 +62,8 @@ router.get('/students/id', function(req, res){
 				saddress: rows[0].address,
 				sgender: rows[0].gender,
 				sdate_of_birth: date_of_birth,
+				smail: rows[0].mail,
+				sdate_of_entry: date_of_entry,
 				sOldId: rows[0].id_student_id
 			})
 		}            

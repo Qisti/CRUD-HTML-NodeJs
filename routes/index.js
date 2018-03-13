@@ -41,6 +41,8 @@ function getStudentGender(studentGender){
 
 router.get('/students', function(req, res) {
   var studentList = [];
+  // var basedOn = req.body.basedOn;
+  // var search = req.body.search;
 
   // Do the query to get data.
   connection.query('SELECT * FROM students', function(err, rows, fields) {
@@ -53,7 +55,8 @@ router.get('/students', function(req, res) {
       // Loop check on each row
       for (var i = 0; i < rows.length; i++) {
         var gender = getStudentGender(rows[i].gender);
-         var date_of_birth = formatDate(rows[i].date_of_birth);
+        var date_of_birth = formatDate(rows[i].date_of_birth);
+        var date_of_entry = formatDate(rows[i].date_of_entry);
 
         // Create an object to save current row's data
         var student = {
@@ -61,7 +64,9 @@ router.get('/students', function(req, res) {
           'name':rows[i].name,
           'gender': gender,
           'date_of_birth':date_of_birth,
-          'address':rows[i].address
+          'address':rows[i].address,
+          'mail': rows[i].mail,
+          'date_of_entry': date_of_entry
         }
         // Add object into array
         studentList.push(student);
@@ -99,35 +104,22 @@ router.get('/students/:id', function(req, res){
   		}
   		else { // if user found
         var dateOB = formatDateForPug(rows[0].date_of_birth);
-        
+        var dateOE = formatDateForPug(rows[0].date_of_entry);
+
   			res.render('edit', {
   				title: 'Edit Student', 
   				Id_student: rows[0].id_student,
   				Name: rows[0].name,
   				Address: rows[0].address,
   			  Gender: rows[0].gender,
-  				Date_of_birth: dateOB
+          Date_of_birth: dateOB,
+          Mail: rows[0].mail,
+          Date_of_entry: rows[0].dateOE
   			});
-      
       }
               
       });
 });
-
-// router.get('/update', function(req, res) {
-//   var insert = {
-//     id_student: req.body.id_student,
-//     name: req.body.name,
-//     gender: req.body.gender,
-//     date_of_birth: req.body.date_of_birth,
-//     address: req.body.address
-// }
-  
-//   connection.query('UPDATE students SET ? ', insert, 'WHERE id_student= ?', id, function(err, rows) {
-//     if (err) throw err;
-//     res.redirect('/students');
-//   })
-// })
 
 router.post('/update', function(req, res) {
   var id_student = req.body.id_student;
@@ -135,11 +127,11 @@ router.post('/update', function(req, res) {
   var gender= req.body.gender;
   var date_of_birth= req.body.date_of_birth;
   var address= req.body.address;
-  var postData  = {id_student: id_student, name: name, address: address, gender: gender, date_of_birth: date_of_birth};
- 
-  //student_id = ?, name = ?, address = ?, gender = ?, date_of_birth = ? WHERE student_id = ?', [studentId, studentName, studentAddress, studentGender, studentDoB,
-  // res.send('berhasil');
-  connection.query('UPDATE students SET id_student = ?, name = ?, gender = ?, date_of_birth = ?, address = ? WHERE id_student = ?', [id_student, name, gender, date_of_birth, address, id_student], function(err, rows) {
+  var mail= req.body.mail;
+  var date_of_entry= req.body.date_of_entry;
+  var postData  = {id_student: id_student, name: name, address: address, gender: gender, date_of_birth: date_of_birth, mail: mail, date_of_entry: date_of_entry};
+
+  connection.query('UPDATE students SET id_student = ?, name = ?, gender = ?, date_of_birth = ?, address = ?, mail = ?, date_of_entry = ? WHERE id_student = ?', [id_student, name, gender, date_of_birth, address, id_student, mail, date_of_entry], function(err, rows) {
     if (err) throw err;
   });
   res.redirect('/students');
@@ -152,7 +144,128 @@ router.post('/delete-student/:id', function(req, res) {
     if(err) throw err
     res.redirect('/students');
   });
-})
+});
+
+router.post('/filter', function(req,res){
+  var studentList = [];
+  var search = req.body.search;
+  var basedOn = req.body.basedOn;
+  var order = req.body.order;
+  
+  var sql = "SELECT * FROM students WHERE "+basedOn+" LIKE '%"+search+"%' ORDER BY "+basedOn+" "+order+"";
+  console.log(sql);
+
+  // Do the query to get data.
+  connection.query(sql, function(err, rows, fields) {
+    if (err) {
+      res.status(500).json({"status_code": 500,"status_message": "internal server error"});
+    } else {
+      console.log(rows);
+
+      // Loop check on each row
+      for (var i = 0; i < rows.length; i++) {
+
+        // Create an object to save current row's data
+        var student = {
+          'id_student':rows[i].id_student,
+          'name':rows[i].name,
+          'gender':getStudentGender(rows[i].gender),
+          'date_of_birth':formatDate(rows[i].date_of_birth),
+          'address':rows[i].address,
+          'mail':rows[i].mail,
+          'date_of_entry':formatDate(rows[i].date_of_entry)
+        }
+        // Add object into array
+        studentList.push(student);
+    }
+
+    // Render index.pug page using array 
+    res.render('index', {title: 'Student List', data: studentList});
+    }
+  });
+});
+
+function transpose(original) {
+  var copy = [];
+  for (var i = 0; i < original.length; ++i) {
+      for (var j = 0; j < original[i].length; ++j) {
+          // skip undefined values to preserve sparse array
+          if (original[i][j] === undefined) continue;
+          // create row if it doesn't exist yet
+          if (copy[j] === undefined) copy[j] = [];
+          // swap the x and y coords for the copy
+          copy[j][i] = original[i][j];
+      }
+  }
+  return copy;
+}
+
+router.get('/statistic', function(req, res)  {
+  var getMonth = []; getfrek = []; temp_monthfrek=[]; trans_month=[]; getgender = []; getfrekgen = []; temp_genderfrek=[]; trans_gend=[];
+
+  connection.query('select * from frek_month', function(err, rows, fields) {
+    if (err) {
+      console.log(err)
+    } else {
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].month == 1) {
+          getMonth.push("January");
+        } else if (rows[i].month == 2) {
+          getMonth.push("February");
+        } else if (rows[i].month == 3) {
+          getMonth.push("March");
+        } else if (rows[i].month == 4) {
+          getMonth.push("April");
+        } else if (rows[i].month == 5) {
+          getMonth.push("May");
+        } else if (rows[i].month == 6) {
+          getMonth.push("June");
+        } else if (rows[i].month == 7) {
+          getMonth.push("July ");
+        } else if (rows[i].month == 8) {
+          getMonth.push("August");
+        } else if (rows[i].month == 9) {
+          getMonth.push("September ");
+        } else if (rows[i].month == 10) {
+          getMonth.push("October ");
+        } else if (rows[i].month == 11) {
+          getMonth.push("November");
+        } else if (rows[i].month == 12) {
+          getMonth.push("December");
+        }
+        getfrek.push(rows[i].Frek)       
+      }
+      temp_monthfrek.push(getMonth,getfrek)
+    }
+  var trans_month = transpose(temp_monthfrek);  
+  console.log(trans_month);
+});
+
+  connection.query('SELECT gender, count(gender) as frek_gend FROM students GROUP BY gender', function(err, rows, fields) {
+    if (err) {
+      console.log(err)
+    } else {
+      getgender.push('gender')
+      getfrekgen.push('frek gend')
+      for (var j = 0 ; j < rows.length ; j++) {
+        if (rows[j].gender === 'f') {
+          getgender.push('FEMALE')
+        } else {
+          getgender.push('MALE')
+        }
+        getfrekgen.push(rows[j].frek_gend)       
+      }
+      temp_genderfrek.push(getgender,getfrekgen)
+    }
+    var trans_gend = transpose(temp_genderfrek);  
+    console.log(trans_gend);
+    res.render('statistic',{obj2: JSON.stringify(trans_gend)});
+  });
+
+});
+
+
+
 
 
 module.exports = router;
