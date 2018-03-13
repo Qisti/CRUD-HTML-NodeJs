@@ -238,34 +238,33 @@ router.get('/statistic', function(req, res)  {
         getfrek.push(rows[i].frekuensi)   
           
       }
-      temp_monthfrek.push(getMonth,getfrek)  
-      var trans_month = adapt(temp_monthfrek);
-      console.log(trans_month);  
+      temp_monthfrek.push(getMonth,getfrek);
     }
+    var trans_month = adapt(temp_monthfrek);
+    console.log(trans_month);
 
-});
-
-  connection.query('SELECT gender, count(gender) as frek_gend FROM students GROUP BY gender', function(err, rows, fields) {
-    if (err) {
-      console.log(err)
-    } else {
-      getgender.push('gender')
-      getfrekgen.push('frek gend')
-      for (var j = 0 ; j < rows.length ; j++) {
-        if (rows[j].gender === 'f') {
-          getgender.push('FEMALE')
-        } else {
-          getgender.push('MALE')
+    connection.query('SELECT gender, count(gender) as frek_gend FROM students GROUP BY gender', function(err, rows, fields) {
+      if (err) {
+        console.log(err)
+      } else {
+        getgender.push('gender')
+        getfrekgen.push('frek gend')
+        for (var j = 0 ; j < rows.length ; j++) {
+          if (rows[j].gender === 'f') {
+            getgender.push('FEMALE')
+          } else {
+            getgender.push('MALE')
+          }
+          getfrekgen.push(rows[j].frek_gend)       
         }
-        getfrekgen.push(rows[j].frek_gend)       
+        temp_genderfrek.push(getgender,getfrekgen)
       }
-      temp_genderfrek.push(getgender,getfrekgen)
-    }
-    var trans_gend = adapt(temp_genderfrek);  
-    console.log(trans_gend);
-    res.render('statistic',{obj1: JSON.stringify(trans_month), obj2: JSON.stringify(trans_gend)});
-  });
-
+      var trans_gend = adapt(temp_genderfrek);  
+      console.log(trans_gend);
+      console.log(trans_month);
+      res.render('statistic',{obj1: JSON.stringify(trans_month), obj2: JSON.stringify(trans_gend)});
+    });
+});
 });
 
 

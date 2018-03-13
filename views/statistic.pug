@@ -13,29 +13,22 @@ block content
       google.charts.setOnLoadCallback(drawChart);
         
       function drawChart() { 
-        
-            
-        // Create our data table out of JSON data loaded from server.
-        var data1 = new google.visualization.arrayToDataTable(!{obj1});
-
-        var options1 = {'title':'Students Frequent',
-                       'width':1000,
-                       'height':600};
-
-        // Instantiate and draw our chart, passing in some options.
-        var chart1 = new google.visualization.AreaChart(document.getElementById('chart_div1'));
-        chart1.draw(data1, options1);
-                // Create our data table out of JSON data loaded from server.
         var data2 = new google.visualization.arrayToDataTable(!{obj2});
-
         var options2 = {'title':'Gender Comparison',
                        'width':1000,
                        'height':600};
-
-        // Instantiate and draw our chart, passing in some options.
-        var chart2 = new google.visualization.PieChart(document.getElementById('chart_div2'));
+        var chart2 = new google.visualization.PieChart(document.getElementById('piechart'));
         chart2.draw(data2, options2);
+
+        var data1 = new google.visualization.arrayToDataTable(!{obj1});
+        var options1 = {'title': 'Data inserted by year',
+                        'curveType': 'function',
+                        'height': 600,
+                        'weight': 1000
+                       };
+        var chart1 = new google.visualization.LineChart(document.getElementById('linechart'));
+        chart1.draw(data1, options1);
       }
   body
-    #chart_div1.mt-4.items-center
-    #chart_div2.mt-4.items-center
+    #piechart
+    #linechart
