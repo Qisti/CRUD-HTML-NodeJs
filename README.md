@@ -5,7 +5,7 @@ In this repo, we used:
 * use `javaScript` to write function 
 * use `express-generator`, to quickly create an application skeleton
 * use `google chart api` to draw chart
-* use `tailwind css` for css
+* use `tailwind css` for css template
 * use `mysql` for database
 
 ### What's in the download?

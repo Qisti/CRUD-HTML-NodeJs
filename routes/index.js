@@ -185,7 +185,7 @@ router.post('/filter', function(req,res){
   });
 });
 
-function transpose(original) {
+function adapt(original) {
   var copy = [];
   for (var i = 0; i < original.length; ++i) {
       for (var j = 0; j < original[i].length; ++j) {
@@ -203,42 +203,46 @@ function transpose(original) {
 router.get('/statistic', function(req, res)  {
   var getMonth = []; getfrek = []; temp_monthfrek=[]; trans_month=[]; getgender = []; getfrekgen = []; temp_genderfrek=[]; trans_gend=[];
 
-  connection.query('select * from frek_month', function(err, rows, fields) {
+  connection.query('SELECT month(date_of_entry) AS month, count(*) AS frekuensi FROM students GROUP BY month(date_of_entry);', function(err, rows, fields) {
     if (err) {
       console.log(err)
     } else {
+      getMonth.push('Month');
+      getfrek.push('Freq');
       for (var i = 0; i < rows.length; i++) {
-        if (rows[i].month == 1) {
+        if (rows[i].month === 1) {
           getMonth.push("January");
-        } else if (rows[i].month == 2) {
+        } else if (rows[i].month === 2) {
           getMonth.push("February");
-        } else if (rows[i].month == 3) {
+        } else if (rows[i].month === 3) {
           getMonth.push("March");
-        } else if (rows[i].month == 4) {
+        } else if (rows[i].month === 4) {
           getMonth.push("April");
-        } else if (rows[i].month == 5) {
+        } else if (rows[i].month === 5) {
           getMonth.push("May");
-        } else if (rows[i].month == 6) {
+        } else if (rows[i].month === 6) {
           getMonth.push("June");
-        } else if (rows[i].month == 7) {
+        } else if (rows[i].month === 7) {
           getMonth.push("July ");
-        } else if (rows[i].month == 8) {
+        } else if (rows[i].month === 8) {
           getMonth.push("August");
-        } else if (rows[i].month == 9) {
+        } else if (rows[i].month === 9) {
           getMonth.push("September ");
-        } else if (rows[i].month == 10) {
+        } else if (rows[i].month === 10) {
           getMonth.push("October ");
-        } else if (rows[i].month == 11) {
+        } else if (rows[i].month === 11) {
           getMonth.push("November");
-        } else if (rows[i].month == 12) {
+        } else if (rows[i].month === 12) {
           getMonth.push("December");
         }
-        getfrek.push(rows[i].Frek)       
+        getfrek.push(rows[i].frekuensi)   
+          
       }
-      temp_monthfrek.push(getMonth,getfrek)
+      temp_monthfrek.push(getMonth,getfrek)  
+      var trans_month = adapt(temp_monthfrek);
+      console.log(trans_month);  
     }
-  var trans_month = transpose(temp_monthfrek);  
-  console.log(trans_month);
+
 });
 
   connection.query('SELECT gender, count(gender) as frek_gend FROM students GROUP BY gender', function(err, rows, fields) {
@@ -257,9 +261,9 @@ router.get('/statistic', function(req, res)  {
       }
       temp_genderfrek.push(getgender,getfrekgen)
     }
-    var trans_gend = transpose(temp_genderfrek);  
+    var trans_gend = adapt(temp_genderfrek);  
     console.log(trans_gend);
-    res.render('statistic',{obj2: JSON.stringify(trans_gend)});
+    res.render('statistic',{obj1: JSON.stringify(trans_month), obj2: JSON.stringify(trans_gend)});
   });
 
 });
