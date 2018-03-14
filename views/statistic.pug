@@ -21,12 +21,12 @@ block content
         chart2.draw(data2, options2);
 
         var data1 = new google.visualization.arrayToDataTable(!{obj1});
-        var options1 = {'title': 'Data inserted by year',
+        var options1 = {'title': 'Data inserted by month',
                         'curveType': 'function',
                         'height': 600,
                         'weight': 1000
                        };
-        var chart1 = new google.visualization.LineChart(document.getElementById('linechart'));
+        var chart1 = new google.visualization.AreaChart(document.getElementById('linechart'));
         chart1.draw(data1, options1);
       }
   body

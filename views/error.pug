@@ -1,6 +1,11 @@
 extends layout
 
 block content
+  h3 Duplicate Id
   h1= message
   h2= error.status
   pre #{error.stack}
+  //- form(href='/input')
+  //-   input.bg-teal.text-white.font.py-2.px-4.rounded(class='hover:bg-teal-dark', type='submit', value='Back to add student')
+
+    

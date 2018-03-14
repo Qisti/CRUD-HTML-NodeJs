@@ -24,6 +24,18 @@ connection.connect(function(err) {
   console.log("Connected!");
 });
 
+function formatDateForPug(date) {
+	var d = new Date(date),
+			month = '' + (d.getMonth() + 1),
+			day = '' + d.getDate(),
+			year = d.getFullYear();
+
+if (month.length < 2) month = '0' + month;
+if (day.length < 2) day = '0' + day;
+
+return [year, month, day].join('-');
+}
+
 router.post('/', function(req, res) {
   var insert = {
     id_student: req.body.id_student,
@@ -34,12 +46,21 @@ router.post('/', function(req, res) {
 		mail: req.body.mail,
 		date_of_entry: req.body.date_of_entry 
   }
-  
-  connection.query("INSERT INTO students SET ? ", insert, function(err, res) {
-  if (err) throw err;
-  });
+	var dateNow = new Date();
+	var now = formatDateForPug(dateNow);
+	var date = req.body.date_of_birth;
 
-  res.redirect('/students');
+	
+	if (date >= now){
+		console.log("FAILED");
+	} else {
+		// console.log("BERHASIL")
+    connection.query("INSERT INTO students SET ? ", insert, function(err, res) {
+			if (err) throw err;
+			});
+		
+			res.redirect('/students');
+	}
 });
 
 

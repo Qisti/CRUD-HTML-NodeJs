@@ -241,7 +241,7 @@ router.get('/statistic', function(req, res)  {
       temp_monthfrek.push(getMonth,getfrek);
     }
     var trans_month = adapt(temp_monthfrek);
-    console.log(trans_month);
+    // console.log(trans_month);
 
     connection.query('SELECT gender, count(gender) as frek_gend FROM students GROUP BY gender', function(err, rows, fields) {
       if (err) {

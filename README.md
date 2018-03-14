@@ -36,9 +36,11 @@ Skeleton/
 ### How to Use
 1. Make sure you have installed `npm` in your PC
 2. Make sure you have installed `mysql` in your PC
-3. Download file in this repo or clone this repo, with command :
+3. Install google chart with command :
+    `npm i -D google-charts`
+4. Download file in this repo or clone this repo, with command :
     `https://github.com/Qisti/CRUD-HTML-NodeJs`
-4. Import `crud.sql` to your database 
-5. running in CLI with command :
+5. Import `crud.sql` to your database 
+6. running in CLI with command :
     `DEBUG=databaseApp:* npm start`
-6. Open in your browser with url `localhost:3000/students`
+7. Open in your browser with url `localhost:3000/students`
