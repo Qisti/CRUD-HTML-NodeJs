@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
+var flash = require('connect-flash');
+var alert = require('alert-node');
 
 /* GET home page. */
 // router.get('/', function(req, res){
@@ -45,7 +47,8 @@ router.post('/', function(req, res) {
 		address: req.body.address,
 		mail: req.body.mail,
 		date_of_entry: req.body.date_of_entry 
-  }
+	}
+	var id_student= req.body.id_student;
 	let dateNow = new Date();
 	let now = formatDateForPug(dateNow);
 	let date = req.body.date_of_birth;
@@ -54,12 +57,23 @@ router.post('/', function(req, res) {
 	if (date >= now){
 		console.log("FAILED");
 	} else {
-		// console.log("BERHASIL")
-    connection.query("INSERT INTO students SET ? ", insert, function(err, res) {
+		connection.query('SELECT * FROM students WHERE id_student = ?', id_student, function(err, rows, fields) {
 			if (err) throw err;
-			});
+			if(rows.length > 0) {
+				alert('Your id duplicated !');
+			} else {
+        connection.query("INSERT INTO students SET ? ", insert, function(err, res) {
+					if (err) throw err;
+				 });
+				 res.redirect('/students');
+			}
+			
+		})
+    // connection.query("INSERT INTO students SET ? ", insert, function(err, res) {
+		// 	if (err) throw err;
+		// 	});
 		
-			res.redirect('/students');
+		// 	res.redirect('/students');
 	}
 });
 
