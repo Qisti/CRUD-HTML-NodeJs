@@ -3,13 +3,13 @@ var router = express.Router();
 var mysql = require('mysql');
 
 /* GET home page. */
-router.get('/', function(req, res){
-  res.render('index');
-});
+// router.get('/', function(req, res){
+//   res.render('index');
+// });
 
-router.get('/students', function(req, res) {
-  res.render('index');
-})
+// router.get('/students', function(req, res) {
+//   res.render('index');
+// })
 
 var connection = mysql.createConnection({
   host : 'localhost',
@@ -46,9 +46,9 @@ router.post('/', function(req, res) {
 		mail: req.body.mail,
 		date_of_entry: req.body.date_of_entry 
   }
-	var dateNow = new Date();
-	var now = formatDateForPug(dateNow);
-	var date = req.body.date_of_birth;
+	let dateNow = new Date();
+	let now = formatDateForPug(dateNow);
+	let date = req.body.date_of_birth;
 
 	
 	if (date >= now){

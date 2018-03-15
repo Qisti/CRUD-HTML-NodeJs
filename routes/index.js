@@ -2,9 +2,30 @@ var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
 
+// var passport = require('passport');
+// var local = require('passport-local').Strategy;
+// var passport = require('passport');
+// var LocalStrategy = require('passport-local').Strategy;
+// var flash = require ('connect-flash');
+// var crypto = require ('crypto');
+// var sess = require('express-session');
+// var Store = require('express-session').Store;
+// var BetterMemoryStore = require('session-memory-store')(sess);
+
+
+function isAuthenticated(req, res, next) {
+  if (req.isAuthenticated())
+    return next();
+  res.redirect('/login');
+}
+
 router.get('/input', function(req, res) {
   res.render('input');
 });
+
+// router.get('/', function(req, res) {
+//   res.send('WELCOME');
+// })
 
 var connection = mysql.createConnection({
   host : 'localhost',
@@ -17,6 +38,8 @@ connection.connect(function(err) {
   if (err) throw err;
   console.log("Connected!");
 });
+
+
 
 function formatDate(date) {
   var d = new Date(date),
@@ -41,10 +64,8 @@ function getStudentGender(studentGender){
 
 router.get('/students', function(req, res) {
   var studentList = [];
-  // var basedOn = req.body.basedOn;
-  // var search = req.body.search;
 
-  // Do the query to get data.
+
   connection.query('SELECT * FROM students', function(err, rows, fields) {
     if (err) {
       console.log(err);
@@ -78,9 +99,6 @@ router.get('/students', function(req, res) {
   });
 });
 
-router.get('/', function(req, res) {
-  res.send('WELCOME');
-});
 
 function formatDateForPug(date) {
     var d = new Date(date),
@@ -114,7 +132,7 @@ router.get('/students/:id', function(req, res){
   			  Gender: rows[0].gender,
           Date_of_birth: dateOB,
           Mail: rows[0].mail,
-          Date_of_entry: rows[0].dateOE
+          Date_of_entry: dateOE
   			});
       }
               
@@ -136,7 +154,6 @@ router.post('/update', function(req, res) {
   });
   res.redirect('/students');
 
-  // res.redirect('/students');
 });
 
 router.post('/delete-student/:id', function(req, res) {
@@ -201,6 +218,7 @@ function adapt(original) {
 }
 
 router.get('/statistic', function(req, res)  {
+
   var getMonth = []; getfrek = []; temp_monthfrek=[]; trans_month=[]; getgender = []; getfrekgen = []; temp_genderfrek=[]; trans_gend=[];
 
   connection.query('SELECT month(date_of_entry) AS month, count(*) AS frekuensi FROM students GROUP BY month(date_of_entry);', function(err, rows, fields) {
@@ -269,6 +287,20 @@ router.get('/statistic', function(req, res)  {
 
 
 
+
+// router.get('/login', function(req, res, next) {
+//   var username = req.body.username;
+//   var password = req.body.password;
+
+//   passport.authenticate('local', function(err, user, info) {
+//     if (err) { return next(err); }
+//     if (!username) { return res.redirect('/login'); }
+//     req.logIn(username, function(err) {
+//       if (err) { return next(err); }
+//       return res.redirect('/students');
+//     });
+//   })(req, res, next);
+// });
 
 
 module.exports = router;

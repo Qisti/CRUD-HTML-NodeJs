@@ -15,8 +15,8 @@ block content
             option#order(value='asc') Ascending
             option#order(value='desc') Descending
         button.btn.btn-outline-success.m-2.my-sm-0.rounded(type='submit') Search
-      table.table.mr-4.ml-4(border='1 px')
-        thead.thead-dark.font-bold(align='left')
+      table.table.m-4(border='1 px')
+        thead.thead-dark.font-bold
           tr
             td Student Id
             td Name
@@ -39,9 +39,9 @@ block content
               td= student.date_of_entry
               td
                 form(action='/students/'+student.id_student)
-                  input.bg-teal.text-white.font.py-2.px-4.rounded(class='hover:bg-teal-dark', type='submit', value='Update')
+                  input.bg-blue-dark.text-white.font.py-2.px-4.rounded(class='hover:bg-blue-light', type='submit', value='Update')
               td
                 form(action='/delete-student/'+student.id_student, method='POST')
-                  input.bg-red-lighter.text-white.font.py-2.px-4.rounded(class='hover:bg-red-dark', type='submit', value='Delete', onClick="return confirm_delete()")
+                  input.bg-red-light.text-white.font.py-2.px-4.rounded(class='hover:bg-red-dark', type='submit', value='Delete', onClick="return confirm_delete()")
               
                   
