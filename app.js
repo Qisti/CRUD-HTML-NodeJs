@@ -140,16 +140,7 @@ function isAuthenticated(req, res, next) {
 // console.log(isAuthenticated());
 
 app.use('/input', isAuthenticated, input);
-app.use('/', isAuthenticated, index);
-
-app.get('/logout', function (req, res) {
-  if(!req.isAuthenticated()) {
-     notFound404(req, res, next);
-  } else {
-     req.logout();
-     res.redirect('/login');
-  }
-})
+app.use('/', index);
 
 // app.use('/students', index);
 

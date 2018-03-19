@@ -1,0 +1,31 @@
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css', integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm', crossorigin='anonymous')
+    link(href='https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css', rel='stylesheet')
+    link(href='https://cdn.jsdelivr.net/npm/tailwindcss/dist/preflight.min.css', rel='stylesheet')
+    link(href='https://cdn.jsdelivr.net/npm/tailwindcss/dist/utilities.min.css', rel='stylesheet')
+
+body
+  .w-full.max-w-xs.m-auto.mt-8
+    form.bg-white.shadow-md.rounded.px-8.pt-6.pb-8.mb-4(action='/addUser', method='POST')
+      .mb-4
+        label.block.text-grey-darker.text-sm.font-bold.mb-2(for='username')
+          | Username
+        input#username.shadow.border.rounded.w-full.py-2.px-3.text-grey-darker(type='text', placeholder='Username', name='username')
+      .mb-6
+        label.block.text-grey-darker.text-sm.font-bold.mb-2(for='password')
+          | Password
+        input#password.shadow.border.rounded.w-full.py-2.px-3.text-grey-darker(type='password', name='password')
+      .mb-6
+        label.block.text-grey-darker.text-sm.font-bold.mb-2(for='password2')
+          | Repeat Password
+        input#password2.shadow.border.rounded.w-full.py-2.px-3.text-grey-darker(type='password', name='password2')
+      .mb-6
+        label.block.text-grey-darker.text-sm.font-bold.mb-2(for='email')
+          | Email
+        input#email.shadow.border.rounded.w-full.py-2.px-3.text-grey-darker.mb-3(type='password', name='password2')
+      .flex.items-center.justify-between
+        button.bg-blue.text-white.font-bold.py-2.px-4.rounded(class='hover:bg-blue-dark', type='submit')
+          | Add User

@@ -31,4 +31,18 @@ block content
       }
   body
     #piechart
+    form.form-inline.m-4(action='/statistic/', method='GET')
+      .relative.align-middle
+        select#year.border.text-grey-darker.h-10.m-1.rounded(name='year')
+          option#year(value='2018', name='year') 2018
+          option#year(value='2017', name='year') 2017
+          option#year(value='2016', name='year') 2016
+          option#year(value='2015', name='year') 2015
+          option#year(value='2014', name='year') 2014
+          option#year(value='2013', name='year') 2013
+          option#year(value='2012', name='year') 2012
+        button.btn.btn-outline-success.m-2.my-sm-0.rounded(type='submit') Search Year
     #linechart
+    
+    
+    

@@ -22,6 +22,7 @@ html
         return alert('Tanggal yang dimasukkan salah');
       }
       }
+      
 
   body.col-md-auto.p-4.flex.mb-4.my-4
       .rounded.overflow-hidden.justify-center.shadow-lg.w-full.h-full
@@ -30,7 +31,7 @@ html
           .text-sm.mb-2(class='lg:flex-grow')
             a.block.mt-2.text-white.mr-4.ml-4(href='/students', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
               | Home
-            a.block.mt-2.text-white.mr-4(href='/statistic', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+            a.block.mt-2.text-white.mr-4(href='/statistic/?year=2018', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
               | Statistic
             a.block.mt-2.text-white.mr-4(href='/students', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
               | Student List

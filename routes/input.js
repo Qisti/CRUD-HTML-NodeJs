@@ -5,14 +5,6 @@ var flash = require('connect-flash');
 var alert = require('alert-node');
 
 /* GET home page. */
-// router.get('/', function(req, res){
-//   res.render('index');
-// });
-
-// router.get('/students', function(req, res) {
-//   res.render('index');
-// })
-
 var connection = mysql.createConnection({
   host : 'localhost',
   user : 'root',
@@ -49,13 +41,14 @@ router.post('/', function(req, res) {
 		date_of_entry: req.body.date_of_entry 
 	}
 	var id_student= req.body.id_student;
-	let dateNow = new Date();
-	let now = formatDateForPug(dateNow);
-	let date = req.body.date_of_birth;
+	var dateNow = new Date();
+	var now = formatDateForPug(dateNow);
+	var date = req.body.date_of_birth;
+	var entryDate = req.body.date_of_entry;
 
 	
-	if (date >= now){
-		console.log("FAILED");
+	if (date > now || entryDate > now){
+		alert('Invalid input date !');
 	} else {
 		connection.query('SELECT * FROM students WHERE id_student = ?', id_student, function(err, rows, fields) {
 			if (err) throw err;
@@ -68,12 +61,7 @@ router.post('/', function(req, res) {
 				 res.redirect('/students');
 			}
 			
-		})
-    // connection.query("INSERT INTO students SET ? ", insert, function(err, res) {
-		// 	if (err) throw err;
-		// 	});
-		
-		// 	res.redirect('/students');
+		 });
 	}
 });
 

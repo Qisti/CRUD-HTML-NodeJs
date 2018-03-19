@@ -1,17 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
-
-// var passport = require('passport');
-// var local = require('passport-local').Strategy;
-// var passport = require('passport');
-// var LocalStrategy = require('passport-local').Strategy;
-// var flash = require ('connect-flash');
-// var crypto = require ('crypto');
-// var sess = require('express-session');
-// var Store = require('express-session').Store;
-// var BetterMemoryStore = require('session-memory-store')(sess);
-
+var alert = require('alert-node');
+var util = require('./');
 
 function isAuthenticated(req, res, next) {
   if (req.isAuthenticated())
@@ -22,10 +13,6 @@ function isAuthenticated(req, res, next) {
 router.get('/input', function(req, res) {
   res.render('input');
 });
-
-// router.get('/', function(req, res) {
-//   res.send('WELCOME');
-// })
 
 var connection = mysql.createConnection({
   host : 'localhost',
@@ -38,8 +25,6 @@ connection.connect(function(err) {
   if (err) throw err;
   console.log("Connected!");
 });
-
-
 
 function formatDate(date) {
   var d = new Date(date),
@@ -62,9 +47,40 @@ function getStudentGender(studentGender){
   return gender;
 }
 
+router.get('/user', function(req, res) {
+  res.render('inputUser');
+})
+
+router.post('/addUser', function(req, res) {
+  var insert = {
+    username: req.body.username,
+    password: req.body.password
+  }
+  var email = req.body.email;
+  var password2= req.body.password2;
+
+  if (insert.password === password2) {
+    connection.query('SELECT email FROM users WHERE email = ?', email, function(req, res) {
+      if(err) throw err;
+      if(rows.length>0) {
+        alert('Email already in use !');
+      } else{
+        connection.query('INSERT INTO users SET ?', insert, function(err, res) {
+          if (err) throw err;
+          });
+      }
+    });
+    
+    res.redirect('/login');
+  }
+});
+
+router.get('/forgot', function(req, res) {
+  res.render('forgot');
+});
+
 router.get('/students', function(req, res) {
   var studentList = [];
-
 
   connection.query('SELECT * FROM students', function(err, rows, fields) {
     if (err) {
@@ -148,12 +164,20 @@ router.post('/update', function(req, res) {
   var mail= req.body.mail;
   var date_of_entry= req.body.date_of_entry;
   var postData  = {id_student: id_student, name: name, address: address, gender: gender, date_of_birth: date_of_birth, mail: mail, date_of_entry: date_of_entry};
-
-  connection.query('UPDATE students SET id_student = ?, name = ?, gender = ?, date_of_birth = ?, address = ?, mail = ?, date_of_entry = ? WHERE id_student = ?', [id_student, name, gender, date_of_birth, address, id_student, mail, date_of_entry], function(err, rows) {
-    if (err) throw err;
-  });
-  res.redirect('/students');
-
+  
+  var dateNow = new Date();
+	var now = formatDateForPug(dateNow);
+	var date = req.body.date_of_birth;
+  var entryDate = req.body.date_of_entry;
+  
+  if (date > now || entryDate > now){
+		alert('Invalid input date !');
+	} else {
+    connection.query('UPDATE students SET id_student = ?, name = ?, gender = ?, date_of_birth = ?, address = ?, mail = ?, date_of_entry = ? WHERE id_student = ?', [id_student, name, gender, date_of_birth, address, id_student, mail, date_of_entry], function(err, rows) {
+      if (err) throw err;
+    });
+    res.redirect('/students');
+  }
 });
 
 router.post('/delete-student/:id', function(req, res) {
@@ -196,7 +220,7 @@ router.post('/filter', function(req,res){
         studentList.push(student);
     }
 
-    // Render index.pug page using array 
+    console.log(rows.length);
     res.render('index', {title: 'Student List', data: studentList});
     }
   });
@@ -217,50 +241,34 @@ function adapt(original) {
   return copy;
 }
 
-router.get('/statistic', function(req, res)  {
+// router.get('/statistic', function(req, res) {
+//   res.render('statistic');
+// })
+
+router.get('/statistic/', function(req, res)  {
 
   var getMonth = []; getfrek = []; temp_monthfrek=[]; trans_month=[]; getgender = []; getfrekgen = []; temp_genderfrek=[]; trans_gend=[];
+  // const chartData = [{'January':0, 'February':0, 'March':0, 'April':0, 'May':0, 'June':0, 'July':0, 'August':0, 'September':0, 'October':0, 'November':0, 'December':0}];
 
-  connection.query('SELECT month(date_of_entry) AS month, count(*) AS frekuensi FROM students GROUP BY month(date_of_entry);', function(err, rows, fields) {
+
+  connection.query('SELECT month(date_of_entry) AS month, count(date_of_entry) AS frekuensi FROM students WHERE year(date_of_entry) = '+[req.query.year]+' GROUP BY month(date_of_entry);', function(err, rows, fields) {
     if (err) {
       console.log(err)
     } else {
-      getMonth.push('Month');
-      getfrek.push('Freq');
-      for (var i = 0; i < rows.length; i++) {
-        if (rows[i].month === 1) {
-          getMonth.push("January");
-        } else if (rows[i].month === 2) {
-          getMonth.push("February");
-        } else if (rows[i].month === 3) {
-          getMonth.push("March");
-        } else if (rows[i].month === 4) {
-          getMonth.push("April");
-        } else if (rows[i].month === 5) {
-          getMonth.push("May");
-        } else if (rows[i].month === 6) {
-          getMonth.push("June");
-        } else if (rows[i].month === 7) {
-          getMonth.push("July ");
-        } else if (rows[i].month === 8) {
-          getMonth.push("August");
-        } else if (rows[i].month === 9) {
-          getMonth.push("September ");
-        } else if (rows[i].month === 10) {
-          getMonth.push("October ");
-        } else if (rows[i].month === 11) {
-          getMonth.push("November");
-        } else if (rows[i].month === 12) {
-          getMonth.push("December");
-        }
-        getfrek.push(rows[i].frekuensi)   
-          
-      }
-      temp_monthfrek.push(getMonth,getfrek);
-    }
-    var trans_month = adapt(temp_monthfrek);
-    // console.log(trans_month);
+      getMonth.push('Month', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+      getfrek.push('Frequents', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
+      for (var i = 0; i < rows.length; i++) {
+        var month = rows[i].month;
+        getfrek.fill(rows[i].frekuensi, month, (month+1));
+      }
+
+      temp_monthfrek.push(getMonth, getfrek);
+      console.log(temp_monthfrek);
+    }
+
+    var trans_month = adapt(temp_monthfrek);
+    console.log(trans_month);
     connection.query('SELECT gender, count(gender) as frek_gend FROM students GROUP BY gender', function(err, rows, fields) {
       if (err) {
         console.log(err)
@@ -285,22 +293,5 @@ router.get('/statistic', function(req, res)  {
 });
 });
 
-
-
-
-// router.get('/login', function(req, res, next) {
-//   var username = req.body.username;
-//   var password = req.body.password;
-
-//   passport.authenticate('local', function(err, user, info) {
-//     if (err) { return next(err); }
-//     if (!username) { return res.redirect('/login'); }
-//     req.logIn(username, function(err) {
-//       if (err) { return next(err); }
-//       return res.redirect('/students');
-//     });
-//   })(req, res, next);
-// });
-
-
 module.exports = router;
+

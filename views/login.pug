@@ -19,6 +19,9 @@ body
         label.block.text-grey-darker.text-sm.font-bold.mb-2(for='password')
           | Password
         input#password.shadow.border.rounded.w-full.py-2.px-3.text-grey-darker.mb-3(type='password', name='password')
-      .flex.justify-center
-        button.bg-blue-dark.text-white.w-full.font-bold.py-2.px-4.item-center.rounded(class='hover:bg-blue-light', type='submit')
+      .flex.item-center.justify-between
+        button.bg-blue-dark.text-white.font-bold.py-2.px-4.rounded(class='hover:bg-blue-light', type='submit')
           | Login
+        a.inline-block.align-baseline.font-bold.text-sm.m-right.text-blue(class='hover:text-blue-darker', href='/forgot')
+          | Forgot Password?
+

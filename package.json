@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "alert-node": "^1.1.2",
     "body-parser": "~1.18.2",
     "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.3",
@@ -16,11 +17,13 @@
     "memory": "0.0.3",
     "morgan": "~1.9.0",
     "mysql": "^2.15.0",
+    "node-helper-utilities": "^3.0.0",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "pug": "2.0.0-beta11",
     "serve-favicon": "~2.4.5",
-    "session-memory-store": "^0.2.2"
+    "session-memory-store": "^0.2.2",
+    "vue": "^2.5.16"
   },
   "main": "app.js",
   "devDependencies": {},
