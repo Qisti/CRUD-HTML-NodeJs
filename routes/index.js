@@ -28,9 +28,9 @@ connection.connect(function(err) {
 
 function formatDate(date) {
   var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
+  month = '' + (d.getMonth() + 1),
+  day = '' + d.getDate(),
+  year = d.getFullYear();
 
   if (month.length < 2) month = '0' + month;
   if (day.length < 2) day = '0' + day;
@@ -65,9 +65,9 @@ router.get('/adminList', function(req, res) {
         }
 
         adminList.push(admin);
-    }
+      }
 
-    res.render('adminList', {title: 'Admin List', data: adminList});
+      res.render('adminList', {title: 'Admin List', data: adminList});
     }
   });
 
@@ -96,7 +96,7 @@ router.post('/addUser', function(req, res) {
       connection.query('SELECT username FROM users WHERE username = ?', username, function(err, rows) {
         if(rows.length>0) {
           alert("Username already in use !")
-          } else {
+        } else {
             // var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
             // password = salt+''+password;
             // var spassword = mysql.format('sha1('+password+')');
@@ -113,7 +113,7 @@ router.post('/addUser', function(req, res) {
             });
             res.redirect('/adminList');
           }
-      }); 
+        }); 
     });
   } else{
     alert("Password doesn't match !");
@@ -156,20 +156,20 @@ router.get('/students', function(req, res) {
         }
         // Add object into array
         studentList.push(student);
-    }
+      }
 
     // Render index.pug page using array 
     res.render('index', {title: 'Student List', data: studentList});
-    }
-  });
+  }
+});
 });
 
 
 function formatDateForPug(date) {
-    var d = new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
+  var d = new Date(date),
+  month = '' + (d.getMonth() + 1),
+  day = '' + d.getDate(),
+  year = d.getFullYear();
   
   if (month.length < 2) month = '0' + month;
   if (day.length < 2) day = '0' + day;
@@ -178,30 +178,30 @@ function formatDateForPug(date) {
 }
 
 router.get('/students/:id', function(req, res){
-  	connection.query('SELECT * FROM students WHERE id_student = ?', [req.params.id], function(err, rows, fields) {
-  		if(err) throw err;
-      
-  		// if user not found
-  		if (rows.length <= 0) {
-  				res.redirect('/students')
-  		}
-  		else { // if user found
+  connection.query('SELECT * FROM students WHERE id_student = ?', [req.params.id], function(err, rows, fields) {
+    if(err) throw err;
+    
+      // if user not found
+      if (rows.length <= 0) {
+        res.redirect('/students')
+      }
+      else { // if user found
         var dateOB = formatDateForPug(rows[0].date_of_birth);
         var dateOE = formatDateForPug(rows[0].date_of_entry);
 
-  			res.render('edit', {
-  				title: 'Edit Student', 
-  				Id_student: rows[0].id_student,
-  				Name: rows[0].name,
-  				Address: rows[0].address,
-  			  Gender: rows[0].gender,
+        res.render('edit', {
+          title: 'Edit Student', 
+          Id_student: rows[0].id_student,
+          Name: rows[0].name,
+          Address: rows[0].address,
+          Gender: rows[0].gender,
           Date_of_birth: dateOB,
           Mail: rows[0].mail,
           Date_of_entry: dateOE
-  			});
+        });
       }
-              
-      });
+      
+    });
 });
 
 router.post('/update', function(req, res) {
@@ -215,13 +215,13 @@ router.post('/update', function(req, res) {
   var postData  = {id_student: id_student, name: name, address: address, gender: gender, date_of_birth: date_of_birth, mail: mail, date_of_entry: date_of_entry};
   
   var dateNow = new Date();
-	var now = formatDateForPug(dateNow);
-	var date = req.body.date_of_birth;
+  var now = formatDateForPug(dateNow);
+  var date = req.body.date_of_birth;
   var entryDate = req.body.date_of_entry;
   
   if (date > now || entryDate > now){
-		alert('Invalid input date !');
-	} else {
+    alert('Invalid input date !');
+  } else {
     connection.query('UPDATE students SET id_student = ?, name = ?, gender = ?, date_of_birth = ?, address = ?, mail = ?, date_of_entry = ? WHERE id_student = ?', [id_student, name, gender, date_of_birth, address, id_student, mail, date_of_entry], function(err, rows) {
       if (err) throw err;
     });
@@ -232,7 +232,7 @@ router.post('/update', function(req, res) {
 router.post('/delete-student/:id', function(req, res) {
   connection.query('DELETE FROM students WHERE id_student = ?', [req.params.id], function(err, result) {
     if(err) throw err
-    res.redirect('/students');
+      res.redirect('/students');
   });
 });
 
@@ -267,10 +267,10 @@ router.post('/filter', function(req,res){
         }
         // Add object into array
         studentList.push(student);
-    }
+      }
 
-    console.log(rows.length);
-    res.render('index', {title: 'Student List', data: studentList});
+      console.log(rows.length);
+      res.render('index', {title: 'Student List', data: studentList});
     }
   });
 });
@@ -278,17 +278,17 @@ router.post('/filter', function(req,res){
 function adapt(original) {
   var copy = [];
   for (var i = 0; i < original.length; ++i) {
-      for (var j = 0; j < original[i].length; ++j) {
+    for (var j = 0; j < original[i].length; ++j) {
           // skip undefined values to preserve sparse array
           if (original[i][j] === undefined) continue;
           // create row if it doesn't exist yet
           if (copy[j] === undefined) copy[j] = [];
           // swap the x and y coords for the copy
           copy[j][i] = original[i][j];
+        }
       }
-  }
-  return copy;
-}
+      return copy;
+    }
 
 // router.get('/statistic', function(req, res) {
 //   res.render('statistic');
@@ -339,7 +339,7 @@ router.get('/statistic/', function(req, res)  {
       console.log(trans_month);
       res.render('statistic',{obj1: JSON.stringify(trans_month), obj2: JSON.stringify(trans_gend)});
     });
-});
+  });
 });
 
 module.exports = router;
