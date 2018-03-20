@@ -1,4 +1,4 @@
-# Simple Student Web Server Client 
+# Simple Student Web Server-Client 
 
 In this repo, we used: 
 
