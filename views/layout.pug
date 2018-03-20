@@ -35,8 +35,12 @@ html
               | Statistic
             a.block.mt-2.text-white.mr-4(href='/students', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
               | Student List
-            a.block.mt-2.text-white(href='/input', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+            a.block.mt-2.text-white.mr-4(href='/input', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
               | Add Student
+            a.block.mt-2.text-white.mr-4(href='/addUser', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+              | Add Admin
+            a.block.mt-2.text-white.mr-4(href='/adminList', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+              | Admin List
           .flex.justify-right
             a.block.mt-2.text-white.mr-4(class='lg:inline-block lg:mt-0 hover:text-blue-lightest', href='/login', method='POST', onClick='return confirm_logout()')
               | Logout

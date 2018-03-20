@@ -4,16 +4,26 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var alert = require('alert-node');
 
 var mysql = require('mysql');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var flash = require ('connect-flash');
-var crypto = require ('crypto');
 var sess = require('express-session');
 var Store = require('express-session').Store;
 var BetterMemoryStore = require('session-memory-store')(sess);
 
+const bcrypt2 = require('bcrypt');
+var mongoose = require('mongoose');
+var nodemailer = require('nodemailer');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var bcrypt = require('bcrypt-nodejs');
+var async = require('async');
+var crypto = require('crypto');
+var moment = require('moment');
+// const { EventEmitter }  = require('events');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -21,7 +31,6 @@ var input = require('./routes/input');
 // var edit = require('./routes/edit');
 
 var app = express();
-
 
 var connection = mysql.createConnection({
   host : 'localhost',
@@ -45,7 +54,11 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+// app.use(session({ secret: 'session secret key' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+var sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 
 var store = new BetterMemoryStore({ expires: 60 * 60 * 1000, debug: true });
@@ -61,8 +74,6 @@ var store = new BetterMemoryStore({ expires: 60 * 60 * 1000, debug: true });
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
-
-
 
 passport.use('local', new LocalStrategy({
   username: 'username',
@@ -109,18 +120,145 @@ app.post('/login', passport.authenticate('local', {
   //res.redirect('/students');
 });
 
-// app.get('/login', function(req, res, next) {
-//   passport.authenticate('local', function(err, user, info) {
-//     if (err) { return next(err); }
-//     if (!username) { return res.redirect('/login'); }
-//     req.logIn(username, function(err) {
-//       if (err) { return next(err); }
-//       return res.redirect('/students');
-//     });
-//   })(req, res, next);
-// });
+app.get('/forgot', function(req, res) {
+  res.render('forgot');
+});
 
+app.post('/setPassword', function(req, res, next) {
+  var email = req.body.email;
+  console.log(email);
+  async.waterfall([
+    function(done) {
+      crypto.randomBytes(20, function(err, buf) {
+        var token = buf.toString('hex');
+        done(err, token);
+      });
+    },
+    function(token, done) {
+      var email = req.body.email;
+      connection.query('SELECT * FROM users WHERE email = ?', email, function(err, rows) {
+        if(err) throw err;
+        console.log(rows.length);
+        if(rows.length <= 0) {
+          alert('Email not registered !');
+          // req.flash('error', 'No account with that email address exists.');
+        }
+        console.log(token);
 
+        var swd_token = token;
+        var ate_reset = moment().toDate();
+        var resetPswd = {
+          pswd_token: swd_token, date_reset: ate_reset
+        }
+
+        console.log(resetPswd);
+
+        connection.query('update users set ? where email = "'+email+'"', [resetPswd], function(err, rows) {
+          if(err) throw err;
+          console.log("token di set token :", swd_token);
+          console.log(rows);
+          done(err, token, rows);
+          alert("Check your email to reset password !");
+        });
+      });  
+    },
+    function(token, rows, done) {
+      var mailOptions = {
+        to: email,
+        from: 'passwordreset@demo.com',
+        subject: 'Node.js Password Reset',
+        text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+          'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+          'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+          'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+      };
+      console.log("proses kirim");
+      sgMail.send(mailOptions, function(err) {
+        // req.flash('info', 'An e-mail has been sent to ' + req.body.mail + ' with further instructions.');
+        done(err, 'done');
+      });
+    }
+  ], function(err) {
+    if (err) return next(err);
+    res.redirect('/forgot');
+  });
+});
+
+app.get('/reset/:token', function(req, res){
+
+  connection.query('SELECT * FROM users WHERE pswd_token = ? ', [req.params.token], function(err, rows, fields) {
+    if(err) throw err;
+    console.log("token 2", req.params.token);
+    console.log("length nya rows :", rows);
+    if(rows.length <= 0) {
+      alert("Token is invalid !");
+      console.log("token belumbisa masuk");
+    }
+
+    var username = rows[0].username;
+    res.render('reset', {susername: username});
+    // res.render('reset');
+    console.log(username);
+  });
+});
+
+app.post('/reset/:token', function(req, res) {
+	var username = req.body.username;
+	console.log(username);
+	async.waterfall ([
+		function(done) {
+			connection.query('SELECT * from users where pswd_token = "'+req.params.token+'"', function(err, rows) {
+				if(rows.length <=0){
+          alert("Email not registered !");
+					console.log("email belum terdaftar")
+				}
+        console.log("hasil select 2", rows);
+				
+				var swd_token = undefined;
+				var ate_reset = undefined;
+				var spassword = req.body.password;
+        var spassword2 = req.body.password2;
+        var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
+        spassword = salt+''+spassword;
+        console.log(rows[0].email);
+        var email = rows[0].email;
+
+				var reset = {pswd_token: swd_token, date_reset: ate_reset}
+				connection.query('UPDATE users SET password = sha1("'+spassword+'"), ? WHERE email = "'+email+'"', [reset], function(err, rows) {
+          if(err) throw err;
+          console.log("berhasil set password baru")
+          console.log("rows", rows);
+					// var email = rows[0].email;
+					// console.log("email ke 2", email);
+					// done(err, rows);
+				});
+        // console.log("email ke 2:", email);
+        console.log(username);
+				connection.query('select * from users where username = ?', [username], function(err, rows) {
+            done(err, rows);
+          });
+			});
+		},
+		function(rows, done) {
+      console.log("yang ke 3 :", rows)
+			var optnMsg = {
+				to: rows[0].email,
+        from: 'passwordreset@demo.com',
+        subject: 'Your password has been changed',
+        text: 'Hello,\n\n' +
+          'This is a confirmation that the password for your account ' + rows[0].email + ' has just been changed.\n'
+			};
+			sgMail.send(optnMsg, function(err) {
+				console.log("email sudah dikirim");
+				done(err, 'done');
+			});
+		}
+		], function(err) {
+			if (err) return next(err);
+			// res.render('/');
+			 res.redirect('/');
+		})
+})
 
 app.get('/login', function(req, res){
   // res.render('index', {'message': req.flash('message')});
@@ -137,10 +275,10 @@ function isAuthenticated(req, res, next) {
   } 
   res.redirect('/login');
 }
-// console.log(isAuthenticated());
+
 
 app.use('/input', isAuthenticated, input);
-app.use('/', index);
+app.use('/', isAuthenticated, index);
 
 // app.use('/students', index);
 

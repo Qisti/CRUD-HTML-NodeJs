@@ -1,3 +1,4 @@
+doctype html
 html
   head
     title= title
@@ -6,16 +7,6 @@ html
     link(href='https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css', rel='stylesheet')
     link(href='https://cdn.jsdelivr.net/npm/tailwindcss/dist/preflight.min.css', rel='stylesheet')
     link(href='https://cdn.jsdelivr.net/npm/tailwindcss/dist/utilities.min.css', rel='stylesheet')
-  
+
   body
-    .w-full.max-w-xs.m-auto.py-2.px-4.shadow.mt-8
-      p Enter your email address :
-      form.m-4(action='/setPassword', method='POST')
-        .form-group
-          label Email
-          input#email.form-control.w-full(type='text', name='email', required)
-        .flex.item-center.justify-between
-          button.bg-blue-dark.text-white.font-bold.py-2.px-4.rounded(class='hover:bg-blue-light', type='submit') Submit
-          a.inline-block.font-bold.text-sm.m-right.text-blue(class='hover:text-blue-darker', href='/')
-            | Back to login
-  
+    block content

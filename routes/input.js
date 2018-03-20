@@ -36,9 +36,8 @@ router.post('/', function(req, res) {
     name: req.body.name,
     gender: req.body.gender,
     date_of_birth: req.body.date_of_birth,
-		address: req.body.address,
-		mail: req.body.mail,
-		date_of_entry: req.body.date_of_entry 
+	address: req.body.address,
+	mail: req.body.mail
 	}
 	var id_student= req.body.id_student;
 	var dateNow = new Date();

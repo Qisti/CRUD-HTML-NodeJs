@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1.font-bold.text-center.text-xl.m-4  Admin List
+  table.table.m-4(border='1 px')
+    thead.thead-dark.font-bold.item-center
+      tr
+        td(scope='col') Username
+        td(scope='col') Email
+    tbody
+      for admin in data
+        tr
+          td= admin.username
+          td= admin.email
+
