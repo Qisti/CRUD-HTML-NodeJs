@@ -2,7 +2,7 @@ extends layout
 
 block content
     h1.font-bold.text-center.text-xl.m-4 Edit Student
-    form.m-4(action='/update', method='POST')
+    form.m-4(action='/students/update', method='POST')
       .form-group
         label Student Id
         input#id_student.form-control(name='id_student', required='', value=Id_student)

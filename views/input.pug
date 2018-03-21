@@ -2,7 +2,7 @@ extends layout
 
 block content
       h1.font-bold.text-center.text-xl.m-4 Add Student
-      form.m-4(action='/input', method='POST')
+      form.m-4(action='/students/input', method='POST')
         .form-group
           label Student Id
           input#id_student.form-control(name='id_student', required='')

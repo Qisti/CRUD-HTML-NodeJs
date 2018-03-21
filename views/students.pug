@@ -33,12 +33,12 @@ block content
               td= student.id_student
               td= student.name
               td= student.gender
-              td= moment(student.date_of_birth).format('DD-MM-YYYY')
+              td= student.date_of_birth
               td= student.address
               td= student.mail
-              td= student.date_of_entry
+              td= moment(student.date_of_entry).format('DD-MM-YYYY')
               td
-                form(action='/students/update/'+student.id_student)
+                form(action='/update'+student.id_student)
                   input.bg-blue-dark.text-white.font.py-2.px-4.rounded(class='hover:bg-blue-light', type='submit', value='Update')
               td
                 form(action='/students/delete/'+student.id_student, method='POST')

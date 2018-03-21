@@ -39,9 +39,9 @@ html
               | Add Student
             a.block.mt-2.text-white.mr-4(href='/addUser', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
               | Add Admin
-            a.block.mt-2.text-white.mr-4(href='/adminList', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+            a.block.mt-2.text-white.mr-4(href='/admin/list', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
               | Admin List
           .flex.justify-right
-            a.block.mt-2.text-white.mr-4(class='lg:inline-block lg:mt-0 hover:text-blue-lightest', href='/login', method='POST', onClick='return confirm_logout()')
+            a.block.mt-2.text-white.mr-4(class='lg:inline-block lg:mt-0 hover:text-blue-lightest', href='/login', method='GET', onClick='return confirm_logout()')
               | Logout
         block content
