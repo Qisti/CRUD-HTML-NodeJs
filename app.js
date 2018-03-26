@@ -8,7 +8,6 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const flash = require ('connect-flash');
 const sess = require('express-session');
-const Store = require('express-session').Store;
 const BetterMemoryStore = require('session-memory-store')(sess);
 const async = require('async');
 const crypto = require('crypto');
@@ -16,20 +15,16 @@ const connection = require('./src/db_connect');
 const config = require('./conf/config');
 const app = express();
 const moment = require('moment');
+const validator = require('express-validator');
 app.locals.moment = require('moment');
-// const { EventEmitter }  = require('events');
-// const favicon = require('serve-favicon');
-// const nodemailer = require('nodemailer');
-// const bcrypt = require('bcrypt-nodejs');
-// const conn = require('./conf/connect');
 
 
-var index = require('./routes/index');
-var users = require('./routes/users');
-var students = require('./routes/students');
-var statistic = require('./routes/statistic');
-var admin = require('./routes/admin');
-var login = require('./routes/login');
+const index = require('./routes/index');
+const users = require('./routes/users');
+const students = require('./routes/students');
+const statistic = require('./routes/statistic');
+const admin = require('./routes/admin');
+const login = require('./routes/login');
 // var edit = require('./routes/edit');
 
 // view engine setup
@@ -40,6 +35,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(validator());
 // app.use(session({ secret: 'session secret key' }));
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -66,21 +62,25 @@ passport.use('local', new LocalStrategy({
 
   passReqToCallback: true} , 
   function (req, username, password, done){
-    if(!username || !password ) { return done(null, false, req.flash('message','All fields are required.')); }  
+    if(!username || !password ) { 
+      alert('Username or password required are required !');
+      return done(null, false);
+    }  
 
     connection.query("select * from users where username = ?", [username], function(err, rows){
       console.log(err); console.log(rows);
       if (err) return done(req.flash('message',err));
       if(!rows.length){ 
-        console.log("invalid username or password");
-        return done(null, false, req.flash('message','Invalid username or password.')); }
+        alert('Invalid username or password !');
+        return done(null, false); 
+      }
       salt = config.salt+''+password;
       var encPassword = crypto.createHash('sha1').update(salt).digest('hex');
       var dbPassword  = rows[0].password;
 
       if(!(dbPassword == encPassword)){
-        console.log("password & username gak cocok");
-        return done(null, false, req.flash('message','Invalid username or password.'));
+        alert('Invalid username or password'); 
+        return done(null, false);
       }
       return done(null, rows[0]);
     });
@@ -98,156 +98,6 @@ passport.deserializeUser(function(id_user, done){
   });
 });
 
-// app.post('/login', passport.authenticate('local', {
-//   successRedirect: '/students',
-//   failureRedirect: '/login',
-//   failureFlash: true
-// }), function(req, res, info){
-//   res.render('index',{'message' :req.flash('message')});
-//   console.log("gimana ini?")
-//   // res.redirect('/students');
-// });
-
-// app.get('/forgot', function(req, res) {
-//   res.render('forgot');
-// });
-
-// app.post('/setPassword', function(req, res, next) {
-//   var email = req.body.email;
-//   console.log(email);
-//   async.waterfall([
-//     function(done) {
-//       crypto.randomBytes(20, function(err, buf) {
-//         var token = buf.toString('hex');
-//         done(err, token);
-//       });
-//     },
-//     function(token, done) {
-//       var email = req.body.email;
-//       connection.query('SELECT * FROM users WHERE email = ?', email, function(err, rows) {
-//         if(err) throw err;
-//         console.log(rows.length);
-//         if(rows.length <= 0) {
-//           alert('Email not registered !');
-//           // req.flash('error', 'No account with that email address exists.');
-//         }
-//         console.log(token);
-
-//         var swd_token = token;
-//         var ate_reset = moment().toDate();
-//         var resetPswd = {
-//           pswd_token: swd_token, date_reset: ate_reset
-//         }
-
-//         console.log(resetPswd);
-
-//         connection.query('update users set ? where email = ?', [resetPswd, email], function(err, rows) {
-//           if(err) throw err;
-//           console.log("token di set token :", swd_token);
-//           console.log(rows);
-//           done(err, token, rows);
-//           alert("Check your email to reset password !");
-//         });
-//       });  
-//     },
-//     function(token, rows, done) {
-//       var mailOptions = {
-//         to: email,
-//         from: config.message.from,
-//         subject: config.message.subject_reset,
-//         text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-//         'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-//         'http://' + req.headers.host + '/reset/' + token + '\n\n' +
-//         'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-//       };
-//       console.log("proses kirim");
-//       sgMail.send(mailOptions, function(err) {
-//         done(err, 'done');
-//       });
-//     }
-//     ], function(err) {
-//       if (err) return next(err);
-//       res.redirect('/forgot');
-//     });
-// });
-
-// app.get('/reset/:token', function(req, res){
-
-//   connection.query('SELECT * FROM users WHERE pswd_token = ? ', [req.params.token], function(err, rows, fields) {
-//     if(err) throw err;
-//     console.log("token 2", req.params.token);
-//     console.log("length nya rows :", rows);
-//     if(rows.length <= 0) {
-//       alert("Token is invalid !");
-//       console.log("token belumbisa masuk");
-//     }
-
-//     var username = rows[0].username;
-//     res.render('reset', {susername: username});
-//     console.log(username);
-//   });
-// });
-
-// app.post('/reset/:token', function(req, res) {
-//   var username = req.body.username;
-//   console.log(username);
-//   async.waterfall ([
-//     function(done) {
-//       connection.query('SELECT * from users where pswd_token = ?', [req.params.token], function(err, rows) {
-//         if(rows.length <=0){
-//           alert("Email not registered !");
-//           console.log("email belum terdaftar")
-//         }
-//         console.log("hasil select 2", rows);
-        
-//         var swd_token = undefined;
-//         var ate_reset = undefined;
-//         var spassword = req.body.password;
-//         var spassword2 = req.body.password2;
-//         spassword = config.salt+''+spassword;
-//         console.log(rows[0].email);
-//         var email = rows[0].email;
-
-//         var reset = {pswd_token: swd_token, date_reset: ate_reset}
-//         connection.query('UPDATE users SET password = sha1(" ? "), ? WHERE email = ? ', [password, reset, email], function(err, rows) {
-//           if(err) throw err;
-//           console.log("berhasil set password baru")
-//           console.log("rows", rows);
-//           // var email = rows[0].email;
-//           // console.log("email ke 2", email);
-//           // done(err, rows);
-//         });
-
-//         console.log(username);
-//         connection.query('select * from users where username = ?', [username], function(err, rows) {
-//           done(err, rows);
-//         });
-//       });
-//     },
-//     function(rows, done) {
-//       console.log("yang ke 3 :", rows)
-//       var optnMsg = {
-//         to: rows[0].email,
-//         from: config.message.from,
-//         subject: config.message.subject_success,
-//         text: 'Hello,\n\n' +
-//         'This is a confirmation that the password for your account ' + rows[0].email + ' has just been changed.\n'
-//       };
-//       sgMail.send(optnMsg, function(err) {
-//         console.log("email sudah dikirim");
-//         done(err, 'done');
-//       });
-//     }
-//     ], function(err) {
-//      if (err) return next(err);
-//       res.redirect('/');
-//     })
-// })
-
-// app.get('/login', function(req, res){
-//   res.redirect('/')
-// });
-
 app.get('/',function(req,res){
   res.render('login', {'message' :req.flash('message')});
 });
@@ -260,11 +110,10 @@ function isAuthenticated(req, res, next) {
   res.redirect('/login');
 }
 
-// app.use('/input', input);
 app.use('/', index);
-app.use('/statistic/', statistic);
-app.use('/admin/', admin);
-app.use('/students', students);
+app.use('/statistic/', isAuthenticated, statistic);
+app.use('/admin/',isAuthenticated, admin);
+app.use('/students',isAuthenticated, students);
 app.use('/login', login);
 
 // catch 404 and forward to error handler

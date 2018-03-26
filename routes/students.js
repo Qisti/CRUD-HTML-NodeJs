@@ -5,6 +5,8 @@ const flash = require('connect-flash');
 const alert = require('alert-node');
 const connection = require('../src/db_connect');
 const moment = require('moment');
+const validator = require('express-validator');
+const validator_email = require('email-validator');
 
 function getStudentGender(studentGender){
   if(studentGender === 'f'){
@@ -14,6 +16,22 @@ function getStudentGender(studentGender){
   }
   return gender;
 };
+
+router.use(validator({
+  customValidators: {
+    isValidDate: isValidDate
+  }
+}));
+
+function isValidDate(value) {
+  if (!value.match(/^\d{4}-\d{2}-\d{2}$/)) return false;
+  var years = moment().diff(value, 'years')
+  if (years <= 18) return false;
+
+  const date = new Date(value);
+  if (!date.getTime()) return false;
+  return date.toISOString().slice(0, 10) === value;
+}
 
 router.get('/', function(req, res) {
   var studentList = [];
@@ -29,7 +47,6 @@ router.get('/', function(req, res) {
       for (var i = 0; i < rows.length; i++) {
         var gender = getStudentGender(rows[i].gender);
 
-        // Create an object to save current row's data
         var student = {
           'id_student':rows[i].id_student,
           'name':rows[i].name,
@@ -39,50 +56,56 @@ router.get('/', function(req, res) {
           'mail': rows[i].mail,
           'date_of_entry': moment(rows[i].date_of_entry).format('DD-MM-YYYY')
         }
-        // Add object into array
+
         studentList.push(student);
       }
 
-    // Render index.pug page using array 
     res.render('index', {title: 'Student List', data: studentList});
   }
 });
 });
 
-// format date for pug = YYYY-MM-DD 
-// format date for mysql = DD-MM-YYYY
-
 router.post('/input', function(req, res) {
-  var insert = {
-    id_student: req.body.id_student,
-    name: req.body.name,
-    gender: req.body.gender,
-    date_of_birth: req.body.date_of_birth,
-    address: req.body.address,
-    mail: req.body.mail
-  }
-  var id_student= req.body.id_student;
-  var now = new Date ();
-  now = moment(now).format('YYYY-MM-DD');
-  var date = req.body.date_of_birth;
-  var entryDate = req.body.date_of_entry;
+  req.checkBody("id_student",'input name').notEmpty();  
+  req.checkBody("name",'input name').notEmpty();
+  req.checkBody("gender",'input gender').notEmpty();
+  req.checkBody("date_of_birth",'input name').isValidDate();
+  var errors = req.validationErrors();
 
-  
-  if (date > now || entryDate > now){
-    alert('Invalid input date !');
+  if (errors) {
+    alert("Please input valid format !");
   } else {
-    connection.query('SELECT * FROM students WHERE id_student = ?', id_student, function(err, rows, fields) {
-      if (err) throw err;
-      if(rows.length > 0) {
-        alert('Your id duplicated !');
+    var insert = {
+      id_student: req.body.id_student,
+      name: req.body.name,
+      gender: req.body.gender,
+      date_of_birth: req.body.date_of_birth,
+      address: req.body.address,
+      mail: req.body.mail
+    }
+    var now = new Date ();
+    now = moment(now).format('YYYY-MM-DD');
+    var entryDate = req.body.date_of_entry;
+    var val = validator_email.validate(insert.mail);
+    if (val === false){
+      alert("email not valid");
+    } else {
+      if (insert.date_of_birth > now || entryDate > now){
+        alert('Invalid input date !');
       } else {
-        connection.query("INSERT INTO students SET ? ", insert, function(err, res) {
+        connection.query('SELECT * FROM students WHERE id_student = ?', insert.id_student, function(err, rows, fields) {
           if (err) throw err;
+          if(rows.length > 0) {
+            alert('Your id duplicated !');
+          } else {
+            connection.query("INSERT INTO students SET ? ", insert, function(err, res) {
+              if (err) throw err;
+            });
+            res.redirect('/students');
+          }
         });
-        res.redirect('/students');
       }
-      
-    });
+    }
   }
 });
 
@@ -114,13 +137,10 @@ router.get('/id', function(req, res){
 router.get('/update/:id', function(req, res){
   connection.query('SELECT * FROM students WHERE id_student = ?', [req.params.id], function(err, rows, fields) {
     if(err) throw err;
-    
-      // if user not found
       if (rows.length <= 0) {
         res.redirect('/students')
       }
-      else { // if user found
-
+      else { 
         res.render('edit', {
           title: 'Edit Student', 
           Id_student: rows[0].id_student,
@@ -137,28 +157,39 @@ router.get('/update/:id', function(req, res){
 });
 
 router.post('/update', function(req, res) {
-  var id_student = req.body.id_student;
-  var name= req.body.name;
-  var gender= req.body.gender;
-  var date_of_birth= req.body.date_of_birth;
-  var address= req.body.address;
-  var mail= req.body.mail;
-  
-  var dateNow = new Date();
-  var now = moment(dateNow).format('YYYY-MM-DD')
-  // var now = formatDateForPug(dateNow);
-  var date = req.body.date_of_birth;
-  var entryDate = req.body.date_of_entry;
-  
-  if (date > now || entryDate > now){
-    alert('Invalid input date !');
+  req.checkBody("id_student",'input name').notEmpty();  
+  req.checkBody("name",'input name').notEmpty();
+  req.checkBody("gender",'input gender').notEmpty();
+  req.checkBody("date_of_birth",'input name').isValidDate();
+  var errors = req.validationErrors();
+
+  if (errors) {
+    alert("Please input valid format !");
   } else {
-    connection.query("UPDATE students SET id_student = ?, name = ?, gender = ?, date_of_birth = ?, address = ?, mail = ? WHERE id_student = ?", [id_student, name, gender, date_of_birth, address, mail, id_student ], function(err, rows) {
-      if (err) throw err;
-      console.log(rows);
-      res.redirect('/students');
-  });
-    
+    var id_student = req.body.id_student;
+    var name = req.body.name;
+    var gender = req.body.gender;
+    var date_of_birth = req.body.date_of_birth;
+    var address = req.body.address;
+    var mail= req.body.mail;
+    var dateNow = new Date();
+    var now = moment(dateNow).format('YYYY-MM-DD')
+    var entryDate = req.body.date_of_entry;
+    var val = validator.validate(mail);
+
+    if (date_of_birth > now || entryDate > now){
+      alert('Invalid input date !');
+    } else {
+      if (val === false) {
+        alert("Please input valid format email !");
+      } else {
+        connection.query("UPDATE students SET id_student = ?, name = ?, gender = ?, date_of_birth = ?, address = ?, mail = ? WHERE id_student = ?", [id_student, name, gender, date_of_birth, address, mail, id_student ], function(err, rows) {
+          if (err) throw err;
+          console.log(rows);
+          res.redirect('/students');
+        });  
+      }
+    } 
   }
 });
 

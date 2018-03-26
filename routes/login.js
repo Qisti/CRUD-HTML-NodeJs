@@ -1,5 +1,5 @@
 const express = require('express');
-var router = express.Router();
+const router = express.Router();
 const app = express();
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -13,7 +13,7 @@ const alert = require('alert-node');
 const connection = require('../src/db_connect');
 const config = require('../conf/config');
 
-var sgMail = require('@sendgrid/mail');
+const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 app.get('/', function(req, res){
@@ -78,10 +78,7 @@ app.post('/setPassword', function(req, res, next) {
           to: email,
           from: config.message.from,
           subject: config.message.subject_reset,
-          text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-          'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-          'http://' + req.headers.host + '/reset/' + token + '\n\n' +
-          'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+          text: config.message.text_reset1 + 'http://' + req.headers.host + '/reset/' + token + '\n\n' + config.message.text_reset2
         };
         console.log("proses kirim");
         sgMail.send(mailOptions, function(err) {
@@ -137,9 +134,6 @@ app.get('/reset/:token', function(req, res){
             if(err) throw err;
             console.log("berhasil set password baru")
             console.log("rows", rows);
-            // var email = rows[0].email;
-            // console.log("email ke 2", email);
-            // done(err, rows);
           });
   
           console.log(username);
@@ -154,8 +148,7 @@ app.get('/reset/:token', function(req, res){
           to: rows[0].email,
           from: config.message.from,
           subject: config.message.subject_success,
-          text: 'Hello,\n\n' +
-          'This is a confirmation that the password for your account ' + rows[0].email + ' has just been changed.\n'
+          text: config.message.text_confirm
         };
         sgMail.send(optnMsg, function(err) {
           console.log("email sudah dikirim");

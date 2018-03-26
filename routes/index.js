@@ -1,7 +1,7 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const connection = require('../src/db_connect');
-var alert = require('alert-node');
+const alert = require('alert-node');
 
 function isAuthenticated(req, res, next) {
   if (req.isAuthenticated())
